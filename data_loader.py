@@ -7,11 +7,23 @@ def load_and_preprocess_data(file_path: str) -> pd.DataFrame:
     print("--- Task I: Data Preparation ---")
 
     try:
-        df = pd.read_excel(file_path)
-        print(f"Successfully loaded data from '{file_path}'.")
+        # مرحله ۱: خواندن تمام شیت‌ها به صورت یک دیکشنری
+        # کلیدها نام شیت‌ها و مقادیر دیتافریم‌های مربوطه خواهند بود
+        all_sheets_dict = pd.read_excel(file_path, sheet_name=None, engine='openpyxl')
+        print(f"Successfully found sheets: {list(all_sheets_dict.keys())}")
+
+        # مرحله ۲: ادغام تمام دیتافریم‌ها در یک دیتافریم واحد
+        df = pd.concat(all_sheets_dict.values(), ignore_index=True)
+        print(f"Successfully combined all sheets into a single DataFrame.")
+
     except FileNotFoundError:
         print(f"Error: The file at '{file_path}' was not found.")
-        exit()
+        # نکته: بهتر است به جای exit()، خطا را به بالا ارسال کنیم تا main.py مدیریت کند
+        raise 
+
+    except Exception as e:
+        print(f"An error occurred while reading the Excel file: {e}")
+        return None # یا raise
 
     print("\nInitial data information:")
     df.info()
@@ -51,19 +63,19 @@ def load_and_preprocess_data(file_path: str) -> pd.DataFrame:
 
 
 
-if __name__ == '__main__':
-    file_path_to_test = 'online_retail_II.xlsx'
+# if __name__ == '__main__':
+#     file_path_to_test = 'online_retail_II.xlsx'
     
-    print(f"--- TESTING '{__file__}' ---")
-    print(f"Attempting to load and process data from: {file_path_to_test}")
+#     print(f"--- TESTING '{__file__}' ---")
+#     print(f"Attempting to load and process data from: {file_path_to_test}")
     
-    cleaned_dataframe = load_and_preprocess_data(file_path_to_test)
+#     cleaned_dataframe = load_and_preprocess_data(file_path_to_test)
     
-    if cleaned_dataframe is not None:
-        print("\n--- TEST SUCCEEDED ---")
-        print("The function returned a DataFrame. Here are its final info and first 5 rows:")
-        cleaned_dataframe.info()
-        print(cleaned_dataframe.head())
-    else:
-        print("\n--- TEST FAILED ---")
-        print("The function did not return a DataFrame.")
+#     if cleaned_dataframe is not None:
+#         print("\n--- TEST SUCCEEDED ---")
+#         print("The function returned a DataFrame. Here are its final info and first 5 rows:")
+#         cleaned_dataframe.info()
+#         print(cleaned_dataframe.head())
+#     else:
+#         print("\n--- TEST FAILED ---")
+#         print("The function did not return a DataFrame.")
