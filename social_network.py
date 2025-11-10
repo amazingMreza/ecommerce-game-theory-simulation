@@ -10,18 +10,7 @@ INFLUENCER_WEIGHT = 5.0
 REGULAR_WEIGHT = 1.0
 
 def create_customer_network(customer_ids, n_influencers=10, p_connection=0.05):
-    """
-    Creates a social network of customers using NetworkX.
-
-    Args:
-        customer_ids (list): A list of unique customer IDs to be used as nodes.
-        n_influencers (int): The number of customers to be designated as influencers.
-        p_connection (float): The probability of creating an edge between any two nodes
-                              in the random graph model.
-
-    Returns:
-        nx.Graph: A NetworkX graph object representing the customer social network.
-    """
+ 
     # Create an Erdos-Renyi random graph. This model assumes that any two customers
     # have a small probability 'p' of being connected.
     num_customers = len(customer_ids)
@@ -56,3 +45,39 @@ def calculate_total_influence(graph):
     """
     total_influence = sum(data['influence_score'] for node, data in graph.nodes(data=True))
     return total_influence
+if __name__ == '__main__':
+    print("--- Running 'social_network.py' in standalone test mode ---")
+
+    # 1. Create a dummy list of customer IDs for testing
+    dummy_customer_ids = [f'C{i}' for i in range(1000)] # 1000 sample customers
+    
+    # 2. Define test parameters
+    num_influencers_test = 20
+    connection_prob_test = 0.01
+
+    # 3. Call the functions to create and analyze the network
+    print(f"\nCreating a network with {len(dummy_customer_ids)} customers, {num_influencers_test} influencers...")
+    customer_graph = create_customer_network(
+        dummy_customer_ids, 
+        n_influencers=num_influencers_test, 
+        p_connection=connection_prob_test
+    )
+    
+    total_influence_score = calculate_total_influence(customer_graph)
+
+    # 4. Print the results to verify functionality
+    print("\n--- Test Results ---")
+    print(f"Graph created successfully!")
+    print(f"Number of nodes (customers): {customer_graph.number_of_nodes()}")
+    print(f"Number of edges (connections): {customer_graph.number_of_edges()}")
+    print(f"Total calculated influence score: {total_influence_score:.2f}")
+
+    # Verification of score calculation
+    expected_score = (num_influencers_test * INFLUENCER_WEIGHT) + \
+                     ((len(dummy_customer_ids) - num_influencers_test) * REGULAR_WEIGHT)
+    print(f"Expected influence score (for verification): {expected_score:.2f}")
+    
+    if abs(total_influence_score - expected_score) < 0.01:
+        print("\nTest PASSED: Calculated score matches expected score.")
+    else:
+        print("\nTest FAILED: Scores do not match.")
